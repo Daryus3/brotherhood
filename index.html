@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>RPG Evren Haritası</title>
+    <!-- Harita sistemi için gerekli dosyalar (İnternetten çeker) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        body { margin: 0; padding: 0; background-color: #1a1a1a; }
+        #map { height: 100vh; width: 100vw; }
+    </style>
+</head>
+<body>
+
+    <div id="map"></div>
+
+    <script>
+        // 1. Senin haritana özel piksel değerleri
+        var genislik = 1799; 
+        var yukseklik = 1037; 
+
+        // 2. Harita motorunu başlat (Düz resim ayarı)
+        var map = L.map('map', {
+            crs: L.CRS.Simple,
+            minZoom: -1, // Ne kadar uzaklaşabileceği
+            maxZoom: 2   // Ne kadar yakınlaşabileceği
+        });
+
+        // 3. harita.png dosyasını sisteme ekle
+        var bounds = [[0, 0], [yukseklik, genislik]];
+        L.imageOverlay('harita.png', bounds).addTo(map);
+        map.fitBounds(bounds);
+
+        // ==========================================
+        // 4. İNTERAKTİF PİNLER (İŞARETÇİLER)
+        // ==========================================
+
+        // Pin 1: Merkez Krallık Örneği
+        // Koordinatlar [Y, X] şeklindedir. 
+        // Y (Aşağıdan yukarı) 0 ile 1037 arası, X (Soldan sağa) 0 ile 1799 arası değer alır.
+        var merkezPin = L.marker([500, 900]).addTo(map);
+        merkezPin.bindPopup(`
+            <div style="text-align:center;">
+                <h3 style="margin:0;">Başkent Aureon</h3>
+                <p>İmparatorluğun Kalbi</p>
+                <a href="http://localhost:8888/doku.php?id=aureon" target="_blank">
+                    📖 Wiki'ye Git
+                </a>
+            </div>
+        `);
+
+    </script>
+</body>
+</html>
