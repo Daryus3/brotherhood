@@ -3,12 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <title>RPG Evren Haritası</title>
-    <!-- Harita sistemi için gerekli dosyalar (İnternetten çeker) -->
+    <!-- Harita sistemi için gerekli dosyalar[cite: 2] -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
         body { margin: 0; padding: 0; background-color: #1a1a1a; }
         #map { height: 100vh; width: 100vw; }
+
+        /* ==========================================
+           ÖZEL POP-UP TASARIMI (CSS)
+           ========================================== */
+        .leaflet-popup-content-wrapper {
+            background: rgba(20, 20, 25, 0.92) !important;
+            color: #e0e0e0 !important;
+            border: 1px solid #d4af37 !important;
+            border-radius: 8px !important;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6) !important;
+            backdrop-filter: blur(4px);
+        }
+
+        .leaflet-popup-tip {
+            background: rgba(20, 20, 25, 0.92) !important;
+            border-bottom: 1px solid #d4af37 !important;
+            border-right: 1px solid #d4af37 !important;
+        }
+
+        .leaflet-popup-content {
+            margin: 10px 14px !important;
+            line-height: 1.4 !important;
+        }
+
+        .popup-title {
+            margin: 0;
+            color: #f39c12;
+            font-size: 15px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-family: 'Georgia', serif;
+        }
+
+        .popup-subtitle {
+            margin: 4px 0 0 0;
+            color: #aaa;
+            font-size: 12px;
+            font-family: sans-serif;
+        }
     </style>
 </head>
 <body>
@@ -16,49 +56,62 @@
     <div id="map"></div>
 
     <script>
-        // 1. Senin haritana özel piksel değerleri
-        var genislik = 1799; 
-        var yukseklik = 1037; 
+        // 1. Harita piksel değerleri (16384x9421)
+        var genislik = 16384; 
+        var yukseklik = 9421; 
 
-        // 2. Harita motorunu başlat (Düz resim ayarı)
         var map = L.map('map', {
             crs: L.CRS.Simple,
-            minZoom: -2, // Ne kadar uzaklaşabileceği
-            maxZoom: 4   // Ne kadar yakınlaşabileceği
+            minZoom: -4,
+            maxZoom: 1
         });
 
-        // 3. harita.png dosyasını sisteme ekle
         var bounds = [[0, 0], [yukseklik, genislik]];
         L.imageOverlay('harita.png', bounds).addTo(map);
         map.fitBounds(bounds);
 
         // ==========================================
-        // 4. İNTERAKTİF PİNLER (İŞARETÇİLER)
+        // İKON BOYUTUNU VE KONUMUNU AYARLADIĞIMIZ YER
+        // ==========================================
+        var yMerkez = 5000; // Haritadaki Y koordinatı
+        var xMerkez = 7900; // Haritadaki X koordinatı
+        
+        // 📌 BURADAN BOYUTU DEĞİŞTİREBİLİRSİN: 
+        // Sayıyı küçültürsen ikon ufak olur, büyültürsen devleşir.
+        var boyut = 300; 
+
+        var iconBounds = [
+            [yMerkez - (boyut / 2), xMerkez - (boyut / 2)], 
+            [yMerkez + (boyut / 2), xMerkez + (boyut / 2)]
+        ]; 
+
+        var sehirIkonuOverlay = L.imageOverlay('city.svg', iconBounds, {
+            interactive: true 
+        }).addTo(map);
+
+        // ==========================================
+        // POP-UP VE ETKİLEŞİMLER
         // ==========================================
 
-        // Pin 1: Merkez Krallık Örneği
-        var merkezPin = L.marker([550, 850]).addTo(map);
-
-        // Bilgi kutusunun içeriği (Sadece isim ve açıklama kalır)
-        merkezPin.bindPopup(`
+        sehirIkonuOverlay.bindPopup(`
             <div style="text-align:center;">
-                <h3 style="margin:0;">GORDON ŞEHRİ</h3>
-                <p style="margin:5px 0 0 0;">TARAFSIZ BÖLGE</p>
+                <h3 class="popup-title">GORDON ŞEHRİ</h3>
+                <p class="popup-subtitle">TARAFSIZ BÖLGE</p>
             </div>
-        `, { autoClose: false, closeOnClick: false });
+        `, { 
+            autoClose: false, 
+            closeOnClick: false
+        });
 
-        // Fare pinin üzerine geldiğinde (mouseover) bilgi sekmesinin otomatik açılması
-        merkezPin.on('mouseover', function (e) {
+        sehirIkonuOverlay.on('mouseover', function (e) {
             this.openPopup();
         });
 
-        // Fare pimden uzaklaştığında bilgi sekmesinin kapanması
-        merkezPin.on('mouseout', function (e) {
+        sehirIkonuOverlay.on('mouseout', function (e) {
             this.closePopup();
         });
 
-        // Pin noktasına tıklandığı an (click) doğrudan Google Sites sayfasına yönlendirme
-        merkezPin.on('click', function (e) {
+        sehirIkonuOverlay.on('click', function (e) {
             window.open('https://sites.google.com/view/brotherhoodrp/harita/gordon', '_blank');
         });
 
