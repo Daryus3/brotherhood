@@ -37,18 +37,30 @@
         // ==========================================
 
         // Pin 1: Merkez Krallık Örneği
-        // Koordinatlar [Y, X] şeklindedir. 
-        // Y (Aşağıdan yukarı) 0 ile 1037 arası, X (Soldan sağa) 0 ile 1799 arası değer alır.
         var merkezPin = L.marker([550, 850]).addTo(map);
+
+        // Bilgi kutusunun içeriği (Sadece isim ve açıklama kalır)
         merkezPin.bindPopup(`
             <div style="text-align:center;">
                 <h3 style="margin:0;">GORDON ŞEHRİ</h3>
-                <p>TARAFSIZ BÖLGE</p>
-                <a href="https://sites.google.com/view/brotherhoodrp/harita/gordon" target="_blank">
-                    📖 Wiki'ye Git
-                </a>
+                <p style="margin:5px 0 0 0;">TARAFSIZ BÖLGE</p>
             </div>
-        `);
+        `, { autoClose: false, closeOnClick: false });
+
+        // Fare pinin üzerine geldiğinde (mouseover) bilgi sekmesinin otomatik açılması
+        merkezPin.on('mouseover', function (e) {
+            this.openPopup();
+        });
+
+        // Fare pimden uzaklaştığında bilgi sekmesinin kapanması
+        merkezPin.on('mouseout', function (e) {
+            this.closePopup();
+        });
+
+        // Pin noktasına tıklandığı an (click) doğrudan Google Sites sayfasına yönlendirme
+        merkezPin.on('click', function (e) {
+            window.open('https://sites.google.com/view/brotherhoodrp/harita/gordon', '_blank');
+        });
 
     </script>
 </body>
